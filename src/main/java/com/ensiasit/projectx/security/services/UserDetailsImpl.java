@@ -2,6 +2,7 @@ package com.ensiasit.projectx.security.services;
 
 import com.ensiasit.projectx.models.User;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import net.minidev.json.annotate.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+@Data
 @AllArgsConstructor
 public class UserDetailsImpl implements UserDetails {
 
@@ -43,14 +45,6 @@ public class UserDetailsImpl implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getEmail() {
-        return email;
     }
 
     @Override

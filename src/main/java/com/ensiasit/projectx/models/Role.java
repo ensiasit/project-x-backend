@@ -7,9 +7,9 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 @Entity
+@Data
 @NoArgsConstructor
 @Table(name = "auth_roles")
-@Data
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,8 +18,4 @@ public class Role {
     @Enumerated(EnumType.STRING)
     @Column
     private RoleEnum name;
-
-    public Role(RoleEnum name) {
-        this.name = name;
-    }
 }
