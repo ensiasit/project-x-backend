@@ -22,3 +22,4 @@ projectx:
   app:
     jwtSecret: ${JWT_SECRET:secretKey}
     jwtExpirationMs: '3600000'
+    jwtRefreshExpirationMs: '7200000'

@@ -2,12 +2,17 @@ package com.ensiasit.projectx.services;
 
 import com.ensiasit.projectx.dto.request.LoginRequest;
 import com.ensiasit.projectx.dto.request.RegisterRequest;
+import com.ensiasit.projectx.dto.request.TokenRefreshRequest;
 import com.ensiasit.projectx.dto.response.JwtResponse;
+import com.ensiasit.projectx.dto.response.TokenRefreshResponse;
+import com.ensiasit.projectx.exception.TokenRefreshException;
+import com.ensiasit.projectx.models.RefreshToken;
 import com.ensiasit.projectx.models.Role;
 import com.ensiasit.projectx.models.User;
 import com.ensiasit.projectx.repositories.RoleRepository;
 import com.ensiasit.projectx.repositories.UserRepository;
 import com.ensiasit.projectx.security.jwt.JwtUtils;
+import com.ensiasit.projectx.security.services.RefreshTokenService;
 import com.ensiasit.projectx.security.services.UserDetailsImpl;
 import com.ensiasit.projectx.utils.RoleEnum;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +34,7 @@ import java.util.stream.Collectors;
 public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
+    private final RefreshTokenService refreshTokenService;
     private final RoleRepository roleRepository;
     private final PasswordEncoder encoder;
     private final UserRepository userRepository;
@@ -42,12 +48,14 @@ public class AuthServiceImpl implements AuthService {
         String jwt = jwtUtils.generateJwtToken(authentication);
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
         Set<RoleEnum> roles = userDetails.getAuthorities().stream()
                 .map(item -> RoleEnum.valueOf(item.getAuthority()))
                 .collect(Collectors.toSet());
 
         return JwtResponse.builder()
                 .accessToken(jwt)
+                .refreshToken(refreshToken.getToken())
                 .id(userDetails.getId())
                 .username(userDetails.getUsername())
                 .email(userDetails.getEmail())
@@ -99,8 +107,25 @@ public class AuthServiceImpl implements AuthService {
         return new AbstractMap.SimpleEntry<>(Optional.of(user), "User registered successfully!");
     }
 
-    private boolean contains(String strRole) {
+    @Override
+    public TokenRefreshResponse refreshToken(TokenRefreshRequest tokenRefreshRequest) {
+        String requestRefreshToken = tokenRefreshRequest.getRefreshToken();
+        if (refreshTokenService.findByToken(requestRefreshToken).isPresent()) {
+            RefreshToken refreshToken = refreshTokenService.findByToken(requestRefreshToken).get();
+            refreshToken = refreshTokenService.verifyExpiration(refreshToken);
+            User user = refreshToken.getUser();
+            String token = jwtUtils.generateTokenFromUsername(user.getUsername());
 
+            return TokenRefreshResponse.builder()
+                    .accessToken(token)
+                    .refreshToken(requestRefreshToken)
+                    .build();
+        } else {
+            throw new TokenRefreshException(requestRefreshToken, "Refresh token is not in database!");
+        }
+    }
+
+    private boolean contains(String strRole) {
         for (RoleEnum enumRole : RoleEnum.values()) {
             if (enumRole.name().equals(strRole)) {
                 return true;

@@ -2,7 +2,9 @@ package com.ensiasit.projectx.controllers;
 
 import com.ensiasit.projectx.dto.request.LoginRequest;
 import com.ensiasit.projectx.dto.request.RegisterRequest;
+import com.ensiasit.projectx.dto.request.TokenRefreshRequest;
 import com.ensiasit.projectx.dto.response.JwtResponse;
+import com.ensiasit.projectx.dto.response.TokenRefreshResponse;
 import com.ensiasit.projectx.models.User;
 import com.ensiasit.projectx.services.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -38,5 +40,12 @@ public class AuthController {
         } else {
             return ResponseEntity.ok(response.getValue());
         }
+    }
+
+    @PostMapping("/refreshtoken")
+    public ResponseEntity<TokenRefreshResponse> refreshtoken(@Valid @RequestBody TokenRefreshRequest tokenRefreshRequest) {
+
+        TokenRefreshResponse tokenRefreshResponse = authService.refreshToken(tokenRefreshRequest);
+        return ResponseEntity.ok(tokenRefreshResponse);
     }
 }
