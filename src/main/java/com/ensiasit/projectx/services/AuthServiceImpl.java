@@ -70,19 +70,26 @@ public class AuthServiceImpl implements AuthService {
                 .email(registerRequest.getEmail())
                 .password(encoder.encode(registerRequest.getPassword()))
                 .build();
-        Set<RoleEnum> requestedRoles = registerRequest.getRoles();
+
+        Set<String> strRequestedRoles = registerRequest.getRoles();
+        strRequestedRoles.removeIf(strRole -> !contains(strRole));
+        Set<RoleEnum> requestedRoles = strRequestedRoles.stream().map(RoleEnum::valueOf).collect(Collectors.toSet());
         Set<Role> roles = new HashSet<>();
 
-        if (requestedRoles == null || requestedRoles.isEmpty()) {
-            Role userRole = roleRepository.findByName(RoleEnum.ROLE_USER).get();
-            roles.add(userRole);
+        if (requestedRoles.isEmpty()) {
+            if (roleRepository.findByName(RoleEnum.ROLE_USER).isPresent()) {
+                Role userRole = roleRepository.findByName(RoleEnum.ROLE_USER).get();
+                roles.add(userRole);
+            } else {
+                return new AbstractMap.SimpleEntry<>(Optional.empty(), "No role exists for user, create it and try again!");
+            }
         } else {
             for (RoleEnum role : requestedRoles) {
                 if (roleRepository.findByName(role).isPresent()) {
                     Role roleItem = roleRepository.findByName(role).get();
                     roles.add(roleItem);
                 } else {
-                    return new AbstractMap.SimpleEntry<>(Optional.empty(), "Role not found!");
+                    return new AbstractMap.SimpleEntry<>(Optional.empty(), "One/many of the roles specified doesn't exist, create it/them and try again!");
                 }
             }
         }
@@ -90,5 +97,16 @@ public class AuthServiceImpl implements AuthService {
         userRepository.save(user);
 
         return new AbstractMap.SimpleEntry<>(Optional.of(user), "User registered successfully!");
+    }
+
+    private boolean contains(String strRole) {
+
+        for (RoleEnum enumRole : RoleEnum.values()) {
+            if (enumRole.name().equals(strRole)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
