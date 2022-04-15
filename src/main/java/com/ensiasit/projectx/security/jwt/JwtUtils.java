@@ -12,7 +12,6 @@ import java.util.Date;
 @Component
 @Slf4j
 public class JwtUtils {
-
     @Value("${projectx.app.jwtSecret}")
     private String jwtSecret;
 
@@ -34,18 +33,6 @@ public class JwtUtils {
 
     public String getUserNameFromJwtToken(String token) {
         return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
-    }
-
-    public String generateTokenFromUsername(String username) {
-        long currentMillis = System.currentTimeMillis();
-        Date now = new Date(currentMillis);
-        Date exp = new Date(currentMillis + Long.parseLong(jwtExpirationMs));
-        return Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(now)
-                .setExpiration(exp)
-                .signWith(SignatureAlgorithm.HS512, jwtSecret)
-                .compact();
     }
 
     public boolean validateJwtToken(String authToken) {

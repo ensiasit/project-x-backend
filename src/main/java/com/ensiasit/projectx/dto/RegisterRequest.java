@@ -1,14 +1,13 @@
-package com.ensiasit.projectx.dto.request;
+package com.ensiasit.projectx.dto;
 
+import com.ensiasit.projectx.utils.RoleEnum;
 import lombok.Data;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import java.util.Set;
 
 @Data
 public class RegisterRequest {
-
     @NotBlank
     private String username;
 
@@ -19,5 +18,9 @@ public class RegisterRequest {
     @NotBlank
     private String password;
 
-    private Set<String> roles;
+    @NotBlank
+    private long contestId;
+
+    @NotBlank
+    private RoleEnum role;
 }

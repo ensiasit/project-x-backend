@@ -1,21 +1,19 @@
-package com.ensiasit.projectx.dto.response;
+package com.ensiasit.projectx.dto;
 
-import com.ensiasit.projectx.utils.RoleEnum;
 import lombok.Builder;
 import lombok.Data;
-
-import java.util.Set;
 
 @Data
 @Builder
 public class JwtResponse {
+    private String token;
 
-    private String accessToken;
-    private String refreshToken;
     @Builder.Default
     private String tokenType = "Bearer";
+
     private Long id;
+
     private String username;
+
     private String email;
-    private Set<RoleEnum> roles;
 }

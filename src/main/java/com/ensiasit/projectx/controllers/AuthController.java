@@ -1,18 +1,16 @@
 package com.ensiasit.projectx.controllers;
 
-import com.ensiasit.projectx.dto.request.LoginRequest;
-import com.ensiasit.projectx.dto.request.RegisterRequest;
-import com.ensiasit.projectx.dto.request.TokenRefreshRequest;
-import com.ensiasit.projectx.dto.response.JwtResponse;
-import com.ensiasit.projectx.dto.response.TokenRefreshResponse;
+import com.ensiasit.projectx.dto.JwtResponse;
+import com.ensiasit.projectx.dto.LoginRequest;
+import com.ensiasit.projectx.dto.RegisterRequest;
 import com.ensiasit.projectx.models.User;
 import com.ensiasit.projectx.services.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.util.Pair;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.AbstractMap;
 import java.util.Optional;
 
 import static com.ensiasit.projectx.utils.Constants.API_PREFIX;
@@ -26,26 +24,18 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-
         JwtResponse jwtResponse = authService.authenticateUser(loginRequest);
         return ResponseEntity.ok(jwtResponse);
     }
 
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
+        Pair<Optional<User>, String> response = authService.registerUser(registerRequest);
 
-        AbstractMap.SimpleEntry<Optional<User>, String> response = authService.registerUser(registerRequest);
-        if (response.getKey().isEmpty()) {
-            return ResponseEntity.badRequest().body(response.getValue());
+        if (response.getFirst().isEmpty()) {
+            return ResponseEntity.badRequest().body(response.getSecond());
         } else {
-            return ResponseEntity.ok(response.getValue());
+            return ResponseEntity.ok(response.getSecond());
         }
-    }
-
-    @PostMapping("/refreshtoken")
-    public ResponseEntity<TokenRefreshResponse> refreshtoken(@Valid @RequestBody TokenRefreshRequest tokenRefreshRequest) {
-
-        TokenRefreshResponse tokenRefreshResponse = authService.refreshToken(tokenRefreshRequest);
-        return ResponseEntity.ok(tokenRefreshResponse);
     }
 }
