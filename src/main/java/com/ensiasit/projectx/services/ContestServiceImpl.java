@@ -3,9 +3,11 @@ package com.ensiasit.projectx.services;
 import com.ensiasit.projectx.dto.ContestDto;
 import com.ensiasit.projectx.dto.UserContestRoleDto;
 import com.ensiasit.projectx.exceptions.NotFoundException;
+import com.ensiasit.projectx.mappers.ContestMapper;
 import com.ensiasit.projectx.models.Contest;
 import com.ensiasit.projectx.repositories.ContestRepository;
 import com.ensiasit.projectx.repositories.UserContestRoleRepository;
+import com.ensiasit.projectx.utils.RoleEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,42 +19,21 @@ import java.util.Optional;
 public class ContestServiceImpl implements ContestService {
     private final ContestRepository contestRepository;
     private final UserContestRoleRepository userContestRoleRepository;
+    private final AdminService adminService;
+    private final ContestMapper contestMapper;
 
     @Override
     public List<ContestDto> getAll() {
         return contestRepository.findAll().stream()
-                .map(contest -> ContestDto.builder()
-                        .id(contest.getId())
-                        .name(contest.getName())
-                        .startTime(contest.getStartTime())
-                        .endTime(contest.getEndTime())
-                        .freezeTime(contest.getFreezeTime())
-                        .unfreezeTime(contest.getUnfreezeTime())
-                        .publicScoreboard(contest.isPublicScoreboard())
-                        .build())
+                .map(contestMapper::toContestDto)
                 .toList();
     }
 
     @Override
     public ContestDto createContest(ContestDto contestDto) {
-        Contest contest = contestRepository.save(Contest.builder()
-                .name(contestDto.getName())
-                .startTime(contestDto.getStartTime())
-                .endTime(contestDto.getEndTime())
-                .freezeTime(contestDto.getFreezeTime())
-                .unfreezeTime(contestDto.getUnfreezeTime())
-                .publicScoreboard(contestDto.isPublicScoreboard())
-                .build());
+        Contest contest = contestRepository.save(contestMapper.fromContestDto(contestDto));
 
-        return ContestDto.builder()
-                .id(contest.getId())
-                .name(contest.getName())
-                .startTime(contest.getStartTime())
-                .endTime(contest.getEndTime())
-                .freezeTime(contest.getFreezeTime())
-                .unfreezeTime(contest.getUnfreezeTime())
-                .publicScoreboard(contest.isPublicScoreboard())
-                .build();
+        return contestMapper.toContestDto(contest);
     }
 
     @Override
@@ -65,39 +46,26 @@ public class ContestServiceImpl implements ContestService {
 
         Contest contest = contestOptional.get();
 
-        return ContestDto.builder()
-                .id(contest.getId())
-                .name(contest.getName())
-                .startTime(contest.getStartTime())
-                .endTime(contest.getEndTime())
-                .freezeTime(contest.getFreezeTime())
-                .unfreezeTime(contest.getUnfreezeTime())
-                .publicScoreboard(contest.isPublicScoreboard())
-                .build();
+        return contestMapper.toContestDto(contest);
     }
 
     @Override
     public ContestDto deleteContest(long id) {
         Contest contest = contestRepository.deleteContestById(id);
 
-        return ContestDto.builder()
-                .id(contest.getId())
-                .name(contest.getName())
-                .startTime(contest.getStartTime())
-                .endTime(contest.getEndTime())
-                .freezeTime(contest.getFreezeTime())
-                .unfreezeTime(contest.getUnfreezeTime())
-                .publicScoreboard(contest.isPublicScoreboard())
-                .build();
+        return contestMapper.toContestDto(contest);
     }
 
     @Override
     public List<UserContestRoleDto> getAllUserContests(String userEmail) {
+        if (adminService.isAdmin(userEmail)) {
+            return getAll().stream()
+                    .map(contestDto -> contestMapper.toUserContestRoleDto(contestDto, RoleEnum.ROLE_ADMIN))
+                    .toList();
+        }
+
         return userContestRoleRepository.findAllByUserEmail(userEmail).stream()
-                .map(userContestRole -> UserContestRoleDto.builder()
-                        .contest(userContestRole.getContest())
-                        .role(userContestRole.getRole())
-                        .build())
+                .map(contestMapper::toUserContestRoleDto)
                 .toList();
     }
 }

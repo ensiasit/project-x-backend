@@ -29,6 +29,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final ContestRepository contestRepository;
     private final UserContestRoleRepository userContestRoleRepository;
+    private final AdminService adminService;
 
     @Override
     public LoginResponse authenticateUser(LoginRequest loginRequest) {
@@ -87,6 +88,7 @@ public class AuthServiceImpl implements AuthService {
                 .email(user.get().getEmail())
                 .username(user.get().getUsername())
                 .password("HIDDEN")
+                .isAdmin(adminService.isAdmin(userEmail))
                 .build();
     }
 }
