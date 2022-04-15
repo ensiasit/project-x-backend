@@ -1,11 +1,8 @@
 package com.ensiasit.projectx.services;
 
 import com.ensiasit.projectx.dto.ContestDto;
-import com.ensiasit.projectx.dto.UserContestRoleDto;
-import com.ensiasit.projectx.exceptions.NotFoundException;
 import com.ensiasit.projectx.models.Contest;
 import com.ensiasit.projectx.repositories.ContestRepository;
-import com.ensiasit.projectx.repositories.UserContestRoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,21 +13,10 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ContestServiceImpl implements ContestService {
     private final ContestRepository contestRepository;
-    private final UserContestRoleRepository userContestRoleRepository;
 
     @Override
-    public List<ContestDto> getAll() {
-        return contestRepository.findAll().stream()
-                .map(contest -> ContestDto.builder()
-                        .id(contest.getId())
-                        .name(contest.getName())
-                        .startTime(contest.getStartTime())
-                        .endTime(contest.getEndTime())
-                        .freezeTime(contest.getFreezeTime())
-                        .unfreezeTime(contest.getUnfreezeTime())
-                        .publicScoreboard(contest.isPublicScoreboard())
-                        .build())
-                .toList();
+    public List<Contest> getAll() {
+        return contestRepository.findAll();
     }
 
     @Override
@@ -45,7 +31,6 @@ public class ContestServiceImpl implements ContestService {
                 .build());
 
         return ContestDto.builder()
-                .id(contest.getId())
                 .name(contest.getName())
                 .startTime(contest.getStartTime())
                 .endTime(contest.getEndTime())
@@ -56,48 +41,27 @@ public class ContestServiceImpl implements ContestService {
     }
 
     @Override
-    public ContestDto getContest(long id) {
+    public Optional<ContestDto> getContest(Long id) {
         Optional<Contest> contestOptional = contestRepository.findById(id);
 
         if (contestOptional.isEmpty()) {
-            throw new NotFoundException("Incorrect contest id");
+            return Optional.empty();
         }
 
         Contest contest = contestOptional.get();
 
-        return ContestDto.builder()
-                .id(contest.getId())
+        return Optional.of(ContestDto.builder()
                 .name(contest.getName())
                 .startTime(contest.getStartTime())
                 .endTime(contest.getEndTime())
                 .freezeTime(contest.getFreezeTime())
                 .unfreezeTime(contest.getUnfreezeTime())
                 .publicScoreboard(contest.isPublicScoreboard())
-                .build();
+                .build());
     }
 
     @Override
-    public ContestDto deleteContest(long id) {
-        Contest contest = contestRepository.deleteContestById(id);
-
-        return ContestDto.builder()
-                .id(contest.getId())
-                .name(contest.getName())
-                .startTime(contest.getStartTime())
-                .endTime(contest.getEndTime())
-                .freezeTime(contest.getFreezeTime())
-                .unfreezeTime(contest.getUnfreezeTime())
-                .publicScoreboard(contest.isPublicScoreboard())
-                .build();
-    }
-
-    @Override
-    public List<UserContestRoleDto> getAllUserContests(String userEmail) {
-        return userContestRoleRepository.findAllByUserEmail(userEmail).stream()
-                .map(userContestRole -> UserContestRoleDto.builder()
-                        .contest(userContestRole.getContest())
-                        .role(userContestRole.getRole())
-                        .build())
-                .toList();
+    public void deleteContest(Long id) {
+        contestRepository.deleteById(id);
     }
 }

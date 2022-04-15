@@ -1,12 +1,17 @@
 package com.ensiasit.projectx.controllers;
 
-import com.ensiasit.projectx.dto.*;
+import com.ensiasit.projectx.dto.JwtResponse;
+import com.ensiasit.projectx.dto.LoginRequest;
+import com.ensiasit.projectx.dto.RegisterRequest;
+import com.ensiasit.projectx.models.User;
 import com.ensiasit.projectx.services.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.util.Pair;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.security.Principal;
+import java.util.Optional;
 
 import static com.ensiasit.projectx.utils.Constants.API_PREFIX;
 
@@ -18,17 +23,19 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public LoginResponse authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-        return authService.authenticateUser(loginRequest);
+    public ResponseEntity<JwtResponse> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+        JwtResponse jwtResponse = authService.authenticateUser(loginRequest);
+        return ResponseEntity.ok(jwtResponse);
     }
 
     @PostMapping("/register")
-    public RegisterResponse registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
-        return authService.registerUser(registerRequest);
-    }
+    public ResponseEntity<String> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
+        Pair<Optional<User>, String> response = authService.registerUser(registerRequest);
 
-    @GetMapping("/current")
-    public UserDto getCurrentUser(Principal principal) {
-        return authService.getCurrentUser(principal.getName());
+        if (response.getFirst().isEmpty()) {
+            return ResponseEntity.badRequest().body(response.getSecond());
+        } else {
+            return ResponseEntity.ok(response.getSecond());
+        }
     }
 }

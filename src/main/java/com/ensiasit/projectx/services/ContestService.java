@@ -1,18 +1,17 @@
 package com.ensiasit.projectx.services;
 
 import com.ensiasit.projectx.dto.ContestDto;
-import com.ensiasit.projectx.dto.UserContestRoleDto;
+import com.ensiasit.projectx.models.Contest;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ContestService {
-    List<ContestDto> getAll();
+    List<Contest> getAll();
 
     ContestDto createContest(ContestDto contest);
 
-    ContestDto getContest(long id);
+    Optional<ContestDto> getContest(Long id);
 
-    ContestDto deleteContest(long id);
-
-    List<UserContestRoleDto> getAllUserContests(String userEmail);
+    void deleteContest(Long id);
 }
