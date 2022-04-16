@@ -3,6 +3,7 @@ package com.ensiasit.projectx.services;
 import com.ensiasit.projectx.dto.LoginRequest;
 import com.ensiasit.projectx.dto.LoginResponse;
 import com.ensiasit.projectx.dto.RegisterRequest;
+import com.ensiasit.projectx.dto.RegisterResponse;
 import com.ensiasit.projectx.exceptions.BadRequestException;
 import com.ensiasit.projectx.models.Contest;
 import com.ensiasit.projectx.models.User;
@@ -44,7 +45,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void registerUser(RegisterRequest registerRequest) {
+    public RegisterResponse registerUser(RegisterRequest registerRequest) {
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
             throw new BadRequestException("Email already taken");
         }
@@ -70,5 +71,9 @@ public class AuthServiceImpl implements AuthService {
                 .build();
 
         userContestRoleRepository.save(userContestRole);
+
+        return RegisterResponse.builder()
+                .email(user.getEmail())
+                .build();
     }
 }

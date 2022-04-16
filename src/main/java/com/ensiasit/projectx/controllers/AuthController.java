@@ -3,6 +3,7 @@ package com.ensiasit.projectx.controllers;
 import com.ensiasit.projectx.dto.LoginRequest;
 import com.ensiasit.projectx.dto.LoginResponse;
 import com.ensiasit.projectx.dto.RegisterRequest;
+import com.ensiasit.projectx.dto.RegisterResponse;
 import com.ensiasit.projectx.services.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public void registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
-        authService.registerUser(registerRequest);
+    public RegisterResponse registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
+        return authService.registerUser(registerRequest);
     }
 }
