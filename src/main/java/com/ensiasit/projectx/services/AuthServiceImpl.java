@@ -1,8 +1,9 @@
 package com.ensiasit.projectx.services;
 
-import com.ensiasit.projectx.dto.JwtResponse;
 import com.ensiasit.projectx.dto.LoginRequest;
+import com.ensiasit.projectx.dto.LoginResponse;
 import com.ensiasit.projectx.dto.RegisterRequest;
+import com.ensiasit.projectx.exceptions.BadRequestException;
 import com.ensiasit.projectx.models.Contest;
 import com.ensiasit.projectx.models.User;
 import com.ensiasit.projectx.models.UserContestRole;
@@ -10,9 +11,7 @@ import com.ensiasit.projectx.repositories.ContestRepository;
 import com.ensiasit.projectx.repositories.UserContestRoleRepository;
 import com.ensiasit.projectx.repositories.UserRepository;
 import com.ensiasit.projectx.security.jwt.JwtUtils;
-import com.ensiasit.projectx.security.services.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.util.Pair;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -33,33 +32,27 @@ public class AuthServiceImpl implements AuthService {
     private final UserContestRoleRepository userContestRoleRepository;
 
     @Override
-    public JwtResponse authenticateUser(LoginRequest loginRequest) {
+    public LoginResponse authenticateUser(LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
-
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
 
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
-        return JwtResponse.builder()
+        return LoginResponse.builder()
                 .token(jwt)
-                .id(userDetails.getId())
-                .username(userDetails.getUsername())
-                .email(userDetails.getEmail())
                 .build();
     }
 
     @Override
-    public Pair<Optional<User>, String> registerUser(RegisterRequest registerRequest) {
+    public void registerUser(RegisterRequest registerRequest) {
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
-            return Pair.of(Optional.empty(), "Error: Email is already taken!");
+            throw new BadRequestException("Email already taken");
         }
 
         Optional<Contest> contest = contestRepository.findById(registerRequest.getContestId());
 
         if (contest.isEmpty()) {
-            return Pair.of(Optional.empty(), "Error: Invalid contest id!");
+            throw new BadRequestException("Incorrect contest id");
         }
 
         User user = User.builder()
@@ -77,7 +70,5 @@ public class AuthServiceImpl implements AuthService {
                 .build();
 
         userContestRoleRepository.save(userContestRole);
-
-        return Pair.of(Optional.of(user), "User registered successfully!");
     }
 }
