@@ -15,4 +15,6 @@ public interface ContestService {
     ContestDto deleteContest(long id);
 
     List<UserContestRoleDto> getAllUserContests(String userEmail);
+
+    ContestDto updateContest(long id, ContestDto payload);
 }
