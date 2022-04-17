@@ -15,6 +15,9 @@ import java.time.LocalDateTime;
 @Builder
 public class ContestDto {
     @NotBlank
+    private long id;
+
+    @NotBlank
     @NotNull
     private String name;
 

@@ -2,20 +2,20 @@ package com.ensiasit.projectx.controllers;
 
 
 import com.ensiasit.projectx.dto.ContestDto;
-import com.ensiasit.projectx.models.Contest;
+import com.ensiasit.projectx.dto.UserContestRoleDto;
 import com.ensiasit.projectx.services.ContestService;
 import com.ensiasit.projectx.utils.Constants;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.List;
-import java.util.Optional;
 
-@RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping(Constants.API_PREFIX + "/contests")
+@RequiredArgsConstructor
 public class ContestController {
     private final ContestService contestService;
 
@@ -25,23 +25,22 @@ public class ContestController {
     }
 
     @GetMapping
-    public List<Contest> getAllContests() {
+    public List<ContestDto> getAllContests() {
         return contestService.getAll();
     }
 
+    @GetMapping("/current")
+    public List<UserContestRoleDto> getUserContests(Principal principal) {
+        return contestService.getAllUserContests(principal.getName());
+    }
+
     @GetMapping("/{id}")
-    public ResponseEntity<ContestDto> getContest(@PathVariable long id) {
-        Optional<ContestDto> optionalContest = contestService.getContest(id);
-
-        if (optionalContest.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok(optionalContest.get());
+    public ContestDto getContest(@PathVariable long id) {
+        return contestService.getContest(id);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteContest(@PathVariable Long id) {
-        contestService.deleteContest(id);
+    public ContestDto deleteContest(@PathVariable long id) {
+        return contestService.deleteContest(id);
     }
 }
