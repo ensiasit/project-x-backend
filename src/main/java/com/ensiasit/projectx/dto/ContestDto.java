@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Future;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
@@ -14,25 +15,26 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 public class ContestDto {
-    @NotBlank
     private long id;
 
     @NotBlank
-    @NotNull
     private String name;
 
-    @NotBlank
+    @NotNull
+    @Future
     private LocalDateTime startTime;
 
-    @NotBlank
+    @NotNull
+    @Future
     private LocalDateTime endTime;
 
-    @NotBlank
+    @NotNull
+    @Future
     private LocalDateTime freezeTime;
 
-    @NotBlank
+    @NotNull
+    @Future
     private LocalDateTime unfreezeTime;
 
-    @NotBlank
     private boolean publicScoreboard;
 }

@@ -9,12 +9,8 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
-
 @Entity
-@Table(name = "users",
-        uniqueConstraints = {
-                @UniqueConstraint(columnNames = "email")
-        })
+@Table(name = "users")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -27,8 +23,9 @@ public class User {
     @NotBlank
     private String username;
 
-    @Email
     @NotBlank
+    @Email
+    @Column(unique = true, length = 50)
     private String email;
 
     @NotBlank
