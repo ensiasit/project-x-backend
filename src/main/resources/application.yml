@@ -29,4 +29,4 @@ projectx:
     jwtSecret: ${JWT_SECRET:secretKey}
     jwtExpirationMs: ${JWT_EXPIRE_MS:3600000}
     adminEmail: ${ADMIN_EMAIL:admin@gmail.com}
-    adminPassword: ${ADMIN_EMAIL:admin}
+    adminPassword: ${ADMIN_PASSWORD:admin}
