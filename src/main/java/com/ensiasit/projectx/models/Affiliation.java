@@ -1,25 +1,31 @@
 package com.ensiasit.projectx.models;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import com.sun.istack.NotNull;
+import lombok.*;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
 @Data
-@AllArgsConstructor
+@NoArgsConstructor
 @Entity
-public class Submission {
+public class Affiliation {
 
     @Id
     private Long id;
 
+    @NotNull
     @Column
-    private String language;
+    private String name;
 
+    @NotNull
     @Column
-    private 
+    private String country;
+
+    @NotNull
+    @Column
+    private String logo;
 
 }

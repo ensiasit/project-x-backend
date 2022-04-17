@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### BD ###
+**/mysql.yml
+
+**/application-dev.properties
