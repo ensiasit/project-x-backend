@@ -5,7 +5,7 @@ server:
 
 spring:
   datasource:
-    url: 'jdbc:mysql://localhost:3306/projectx'
+    url: 'jdbc:mysql://${DB_HOST:localhost}:3306/${DB_NAME:projectx}'
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:root}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -27,4 +27,4 @@ spring:
 projectx:
   app:
     jwtSecret: ${JWT_SECRET:secretKey}
-    jwtExpirationMs: '3600000'
+    jwtExpirationMs: ${JWT_EXPIRE_MS:3600000}
