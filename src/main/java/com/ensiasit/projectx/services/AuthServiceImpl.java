@@ -1,10 +1,8 @@
 package com.ensiasit.projectx.services;
 
-import com.ensiasit.projectx.dto.LoginRequest;
-import com.ensiasit.projectx.dto.LoginResponse;
-import com.ensiasit.projectx.dto.RegisterRequest;
-import com.ensiasit.projectx.dto.RegisterResponse;
+import com.ensiasit.projectx.dto.*;
 import com.ensiasit.projectx.exceptions.BadRequestException;
+import com.ensiasit.projectx.exceptions.NotFoundException;
 import com.ensiasit.projectx.models.Contest;
 import com.ensiasit.projectx.models.User;
 import com.ensiasit.projectx.models.UserContestRole;
@@ -74,6 +72,20 @@ public class AuthServiceImpl implements AuthService {
 
         return RegisterResponse.builder()
                 .email(user.getEmail())
+                .build();
+    }
+
+    @Override
+    public UserDto getCurrentUser(String userEmail) {
+        Optional<User> user = userRepository.findByEmail(userEmail);
+
+        if (user.isEmpty()) {
+            throw new NotFoundException("Incorrect user email");
+        }
+
+        return UserDto.builder()
+                .email(user.get().getEmail())
+                .username(user.get().getUsername())
                 .build();
     }
 }
