@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,9 +25,8 @@ public class RegisterRequest {
     @NotBlank
     private String password;
 
-    @NotBlank
     private long contestId;
 
-    @NotBlank
+    @NotNull
     private RoleEnum role;
 }
