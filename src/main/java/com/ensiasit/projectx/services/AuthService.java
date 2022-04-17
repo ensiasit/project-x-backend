@@ -1,11 +1,15 @@
 package com.ensiasit.projectx.services;
 
-import com.ensiasit.projectx.dto.*;
+import com.ensiasit.projectx.dto.JwtResponse;
+import com.ensiasit.projectx.dto.LoginRequest;
+import com.ensiasit.projectx.dto.RegisterRequest;
+import com.ensiasit.projectx.models.User;
+import org.springframework.data.util.Pair;
+
+import java.util.Optional;
 
 public interface AuthService {
-    LoginResponse authenticateUser(LoginRequest loginRequest);
+    JwtResponse authenticateUser(LoginRequest loginRequest);
 
-    RegisterResponse registerUser(RegisterRequest registerRequest);
-
-    UserDto getCurrentUser(String userEmail);
+    Pair<Optional<User>, String> registerUser(RegisterRequest registerRequest);
 }

@@ -10,10 +10,11 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "user_contest_role")
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 @Builder
+
 public class UserContestRole {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
