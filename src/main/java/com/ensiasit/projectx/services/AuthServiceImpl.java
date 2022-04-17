@@ -86,6 +86,7 @@ public class AuthServiceImpl implements AuthService {
         return UserDto.builder()
                 .email(user.get().getEmail())
                 .username(user.get().getUsername())
+                .password("HIDDEN")
                 .build();
     }
 }
