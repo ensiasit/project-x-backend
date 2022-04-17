@@ -1,26 +1,26 @@
-package com.ensiasit.projectx.models;
+package com.ensiasit.projectx.dto;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 
-@Entity
-@Table(name = "affiliations")
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Builder
-public class Affiliation {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class AffiliationDto {
+    private long id;
 
+    @NotBlank
     private String name;
 
+    @NotBlank
     private String country;
 
+    @NotBlank
     private String logo;
 }

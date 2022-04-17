@@ -1,18 +1,17 @@
 package com.ensiasit.projectx.services;
 
-import com.ensiasit.projectx.models.Affiliation;
+import com.ensiasit.projectx.dto.AffiliationDto;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface AffiliationService {
-    List<Affiliation> getAll();
+    List<AffiliationDto> getAll();
 
-    Optional<Affiliation> get(Long id);
+    AffiliationDto getAffiliation(long id);
 
-    Affiliation add(Affiliation affiliation);
+    AffiliationDto createAffiliation(AffiliationDto affiliation);
 
-    void delete(Long id);
+    AffiliationDto deleteAffiliation(long id);
 
-    Optional<Affiliation> update(Long id, Affiliation payload);
+    AffiliationDto updateAffiliation(long id, AffiliationDto payload);
 }
