@@ -1,14 +1,12 @@
 package com.ensiasit.projectx.controllers;
 
-import com.ensiasit.projectx.dto.LoginRequest;
-import com.ensiasit.projectx.dto.LoginResponse;
-import com.ensiasit.projectx.dto.RegisterRequest;
-import com.ensiasit.projectx.dto.RegisterResponse;
+import com.ensiasit.projectx.dto.*;
 import com.ensiasit.projectx.services.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.security.Principal;
 
 import static com.ensiasit.projectx.utils.Constants.API_PREFIX;
 
@@ -27,5 +25,10 @@ public class AuthController {
     @PostMapping("/register")
     public RegisterResponse registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
         return authService.registerUser(registerRequest);
+    }
+
+    @GetMapping("/current")
+    public UserDto getCurrentUser(Principal principal) {
+        return authService.getCurrentUser(principal.getName());
     }
 }
