@@ -1,6 +1,5 @@
 package com.ensiasit.projectx.dto;
 
-import com.ensiasit.projectx.models.Contest;
 import com.ensiasit.projectx.utils.RoleEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,5 +13,5 @@ import lombok.NoArgsConstructor;
 public class UserContestRoleDto {
     private RoleEnum role;
 
-    private Contest contest;
+    private ContestDto contest;
 }

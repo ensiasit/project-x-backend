@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface UserContestRoleRepository extends JpaRepository<UserContestRole, Long> {
     List<UserContestRole> findAllByUserEmail(String email);
+
+    void deleteAllByContestId(long contestId);
 }
