@@ -18,6 +18,7 @@ public class Affiliation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true, length = 75)
     private String name;
 
     private String country;

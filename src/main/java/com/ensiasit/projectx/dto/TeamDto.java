@@ -5,26 +5,21 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Builder
-public class UserDto {
+public class TeamDto {
     private long id;
 
     @NotBlank
-    private String username;
+    private String name;
 
-    @Email
-    @NotBlank
-    @Email
-    private String email;
+    private long contestId;
 
-    @NotBlank
-    private String password;
+    private long affiliationId;
 
-    private boolean admin;
+    private String affiliationName;
 }
