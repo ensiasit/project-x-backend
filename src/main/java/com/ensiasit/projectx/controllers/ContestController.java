@@ -50,4 +50,9 @@ public class ContestController {
     public ContestDto deleteContest(@PathVariable long id) {
         return contestService.deleteContest(id);
     }
+
+    @PutMapping("/{id}")
+    private ContestDto updateContest(@PathVariable Long id, @Valid @RequestBody ContestDto payload) {
+        return contestService.updateContest(id, payload);
+    }
 }

@@ -38,20 +38,15 @@ public class ContestServiceImpl implements ContestService {
 
     @Override
     public ContestDto getContest(long id) {
-        Optional<Contest> contestOptional = contestRepository.findById(id);
-
-        if (contestOptional.isEmpty()) {
-            throw new NotFoundException("Incorrect contest id");
-        }
-
-        Contest contest = contestOptional.get();
+        Contest contest = extractContest(id);
 
         return contestMapper.toContestDto(contest);
     }
 
     @Override
     public ContestDto deleteContest(long id) {
-        Contest contest = contestRepository.deleteContestById(id);
+        Contest contest = extractContest(id);
+        contestRepository.deleteById(id);
 
         return contestMapper.toContestDto(contest);
     }
@@ -67,5 +62,38 @@ public class ContestServiceImpl implements ContestService {
         return userContestRoleRepository.findAllByUserEmail(userEmail).stream()
                 .map(contestMapper::toUserContestRoleDto)
                 .toList();
+    }
+
+    @Override
+    public ContestDto updateContest(long id, ContestDto payload) {
+        Contest contest = extractContest(id);
+
+        contest.setName(payload.getName());
+        contest.setStartTime(payload.getStartTime());
+        contest.setEndTime(payload.getEndTime());
+        contest.setFreezeTime(payload.getFreezeTime());
+        contest.setUnfreezeTime(payload.getUnfreezeTime());
+        contest.setPublicScoreboard(payload.isPublicScoreboard());
+        contestRepository.save(contest);
+
+        return ContestDto.builder()
+                .id(contest.getId())
+                .name(contest.getName())
+                .startTime(contest.getStartTime())
+                .endTime(contest.getEndTime())
+                .freezeTime(contest.getFreezeTime())
+                .unfreezeTime(contest.getUnfreezeTime())
+                .publicScoreboard(contest.isPublicScoreboard())
+                .build();
+    }
+
+    private Contest extractContest(long id) {
+        Optional<Contest> contestOptional = contestRepository.findById(id);
+
+        if (contestOptional.isEmpty()) {
+            throw new NotFoundException("Incorrect contest id");
+        }
+
+        return contestOptional.get();
     }
 }
