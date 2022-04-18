@@ -88,7 +88,7 @@ public class AuthServiceImpl implements AuthService {
                 .email(user.get().getEmail())
                 .username(user.get().getUsername())
                 .password("HIDDEN")
-                .isAdmin(adminService.isAdmin(userEmail))
+                .admin(adminService.isAdmin(userEmail))
                 .build();
     }
 }

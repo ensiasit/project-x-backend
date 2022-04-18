@@ -21,5 +21,5 @@ public class UserDto {
     @NotBlank
     private String password;
 
-    private boolean isAdmin;
+    private boolean admin;
 }

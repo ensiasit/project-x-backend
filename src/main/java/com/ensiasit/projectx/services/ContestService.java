@@ -8,13 +8,13 @@ import java.util.List;
 public interface ContestService {
     List<ContestDto> getAll();
 
-    ContestDto createContest(ContestDto contest);
+    ContestDto createContest(String userEmail, ContestDto contest);
 
     ContestDto getContest(long id);
 
-    ContestDto deleteContest(long id);
+    ContestDto deleteContest(String userEmail, long id);
 
     List<UserContestRoleDto> getAllUserContests(String userEmail);
 
-    ContestDto updateContest(long id, ContestDto payload);
+    ContestDto updateContest(String userEmail, long id, ContestDto payload);
 }

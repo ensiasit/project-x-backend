@@ -3,7 +3,6 @@ package com.ensiasit.projectx.controllers;
 
 import com.ensiasit.projectx.dto.ContestDto;
 import com.ensiasit.projectx.dto.UserContestRoleDto;
-import com.ensiasit.projectx.exceptions.ForbiddenException;
 import com.ensiasit.projectx.services.AdminService;
 import com.ensiasit.projectx.services.ContestService;
 import com.ensiasit.projectx.utils.Constants;
@@ -24,11 +23,7 @@ public class ContestController {
 
     @PostMapping
     public ContestDto createContest(Principal principal, @Valid @RequestBody ContestDto contest) {
-        if (adminService.isAdmin(principal.getName())) {
-            return contestService.createContest(contest);
-        }
-
-        throw new ForbiddenException("User is not admin.");
+            return contestService.createContest(principal.getName(), contest);
     }
 
     @GetMapping
@@ -47,12 +42,12 @@ public class ContestController {
     }
 
     @DeleteMapping("/{id}")
-    public ContestDto deleteContest(@PathVariable long id) {
-        return contestService.deleteContest(id);
+    public ContestDto deleteContest(Principal principal, @PathVariable long id) {
+        return contestService.deleteContest(principal.getName(), id);
     }
 
     @PutMapping("/{id}")
-    private ContestDto updateContest(@PathVariable Long id, @Valid @RequestBody ContestDto payload) {
-        return contestService.updateContest(id, payload);
+    public ContestDto updateContest(Principal principal, @PathVariable Long id, @Valid @RequestBody ContestDto payload) {
+        return contestService.updateContest(principal.getName(), id, payload);
     }
 }
