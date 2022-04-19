@@ -5,14 +5,16 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Builder
-public class AffiliationDto {
+public class AffiliationRequest {
     private long id;
 
     @NotBlank
@@ -21,6 +23,6 @@ public class AffiliationDto {
     @NotBlank
     private String country;
 
-    @NotBlank
-    private String logo;
+    @NotNull
+    private MultipartFile logo;
 }
