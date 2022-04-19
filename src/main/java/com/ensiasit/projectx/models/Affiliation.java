@@ -22,5 +22,6 @@ public class Affiliation {
 
     private String country;
 
-    private String logo;
+    @Lob
+    private byte[] logo;
 }

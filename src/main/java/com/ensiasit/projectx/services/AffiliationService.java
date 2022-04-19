@@ -1,17 +1,18 @@
 package com.ensiasit.projectx.services;
 
-import com.ensiasit.projectx.dto.AffiliationDto;
+import com.ensiasit.projectx.dto.AffiliationRequest;
+import com.ensiasit.projectx.dto.AffiliationResponse;
 
 import java.util.List;
 
 public interface AffiliationService {
-    List<AffiliationDto> getAll();
+    List<AffiliationResponse> getAll();
 
-    AffiliationDto getAffiliation(long id);
+    AffiliationResponse getAffiliation(long id);
 
-    AffiliationDto createAffiliation(AffiliationDto affiliation);
+    AffiliationResponse createAffiliation(String userEmail, AffiliationRequest affiliation);
 
-    AffiliationDto deleteAffiliation(long id);
+    AffiliationResponse deleteAffiliation(String userEmail, long id);
 
-    AffiliationDto updateAffiliation(long id, AffiliationDto payload);
+    AffiliationResponse updateAffiliation(String userEmail, long id, AffiliationRequest payload);
 }

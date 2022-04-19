@@ -1,13 +1,16 @@
 package com.ensiasit.projectx.controllers;
 
 
-import com.ensiasit.projectx.dto.AffiliationDto;
+import com.ensiasit.projectx.dto.AffiliationRequest;
+import com.ensiasit.projectx.dto.AffiliationResponse;
 import com.ensiasit.projectx.services.AffiliationService;
 import com.ensiasit.projectx.utils.Constants;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.List;
 
 @CrossOrigin(origins = "*")
@@ -15,32 +18,30 @@ import java.util.List;
 @RequestMapping(Constants.API_PREFIX + "/affiliations")
 @RequiredArgsConstructor
 public class AffiliationController {
-
     private final AffiliationService affiliationService;
 
-    @PostMapping
-    private AffiliationDto createAffiliation(@Valid @RequestBody AffiliationDto affiliation) {
-        return affiliationService.createAffiliation(affiliation);
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public AffiliationResponse createAffiliation(Principal principal, @Valid @ModelAttribute AffiliationRequest affiliation) {
+        return affiliationService.createAffiliation(principal.getName(), affiliation);
     }
 
     @GetMapping
-    private List<AffiliationDto> getAll() {
+    public List<AffiliationResponse> getAll() {
         return affiliationService.getAll();
     }
 
     @GetMapping("/{id}")
-    private AffiliationDto getAffiliation(@PathVariable long id) {
-        return affiliationService
-                .getAffiliation(id);
+    public AffiliationResponse getAffiliation(@PathVariable long id) {
+        return affiliationService.getAffiliation(id);
     }
 
     @DeleteMapping("/{id}")
-    private AffiliationDto deleteAffiliation(@PathVariable long id) {
-        return affiliationService.deleteAffiliation(id);
+    public AffiliationResponse deleteAffiliation(Principal principal, @PathVariable long id) {
+        return affiliationService.deleteAffiliation(principal.getName(), id);
     }
 
-    @PutMapping("/{id}")
-    private AffiliationDto updateAffiliation(@PathVariable Long id, @Valid @RequestBody AffiliationDto payload) {
-        return affiliationService.updateAffiliation(id, payload);
+    @PutMapping(path = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public AffiliationResponse updateAffiliation(Principal principal, @PathVariable long id, @Valid @ModelAttribute AffiliationRequest payload) {
+        return affiliationService.updateAffiliation(principal.getName(), id, payload);
     }
 }

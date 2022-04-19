@@ -23,6 +23,10 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
+  servlet:
+    multipart:
+      max-file-size: -1
+      max-request-size: -1
 
 projectx:
   app:

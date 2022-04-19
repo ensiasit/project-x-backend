@@ -12,7 +12,7 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 @Data
 @Builder
-public class AffiliationDto {
+public class AffiliationResponse {
     private long id;
 
     @NotBlank
@@ -21,6 +21,5 @@ public class AffiliationDto {
     @NotBlank
     private String country;
 
-    @NotBlank
-    private String logo;
+    private byte[] logo;
 }
