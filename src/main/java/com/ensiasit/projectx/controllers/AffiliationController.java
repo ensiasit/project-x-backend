@@ -41,7 +41,7 @@ public class AffiliationController {
     }
 
     @PutMapping(path = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public AffiliationResponse updateAffiliation(Principal principal, @PathVariable Long id, @Valid @ModelAttribute AffiliationRequest payload) {
+    public AffiliationResponse updateAffiliation(Principal principal, @PathVariable long id, @Valid @ModelAttribute AffiliationRequest payload) {
         return affiliationService.updateAffiliation(principal.getName(), id, payload);
     }
 }

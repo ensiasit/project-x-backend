@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,6 +22,5 @@ public class AffiliationRequest {
     @NotBlank
     private String country;
 
-    @NotNull
     private MultipartFile logo;
 }

@@ -71,10 +71,12 @@ public class AffiliationServiceImpl implements AffiliationService {
         affiliation.setName(payload.getName());
         affiliation.setCountry(payload.getCountry());
 
-        try {
-            affiliation.setLogo(payload.getLogo().getBytes());
-        } catch (IOException e) {
-            throw new ServerErrorException("Could not read file content.");
+        if (payload.getLogo() != null) {
+            try {
+                affiliation.setLogo(payload.getLogo().getBytes());
+            } catch (IOException e) {
+                throw new ServerErrorException("Could not read file content.");
+            }
         }
 
         affiliationRepository.save(affiliation);

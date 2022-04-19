@@ -25,7 +25,7 @@ public class AffiliationMapper {
                     .id(affiliationDto.getId())
                     .name(affiliationDto.getName())
                     .country(affiliationDto.getCountry())
-                    .logo(affiliationDto.getLogo().getBytes())
+                    .logo(affiliationDto.getLogo() != null ? affiliationDto.getLogo().getBytes() : null)
                     .build();
         } catch (IOException e) {
             throw new ServerErrorException("Could not read file content");
