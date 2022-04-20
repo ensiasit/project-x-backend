@@ -1,7 +1,6 @@
 package com.ensiasit.projectx.services;
 
 import com.ensiasit.projectx.dto.UserDto;
-import com.ensiasit.projectx.exceptions.BadRequestException;
 import com.ensiasit.projectx.exceptions.ForbiddenException;
 import com.ensiasit.projectx.exceptions.NotFoundException;
 import com.ensiasit.projectx.mappers.UserMapper;
@@ -12,7 +11,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,29 +22,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto updateByEmail(String userEmail, UserDto userDto) {
-        Optional<User> user = userRepository.findByEmail(userEmail);
+        User user = extract(userEmail);
 
-        if (user.isEmpty()) {
-            throw new BadRequestException("Incorrect user email");
-        }
+        user.setEmail(userDto.getEmail());
+        user.setUsername(userDto.getUsername());
+        user.setPassword(encoder.encode(userDto.getPassword()));
 
-        if (!user.get().getEmail().equals(userEmail)) {
-            throw new BadRequestException("Cannot update other user information");
-        }
+        user = userRepository.save(user);
 
-        User updatedUser = user.get();
-
-        updatedUser.setEmail(userDto.getEmail());
-        updatedUser.setUsername(userDto.getUsername());
-        updatedUser.setPassword(encoder.encode(userDto.getPassword()));
-
-        updatedUser = userRepository.save(updatedUser);
-
-        return UserDto.builder()
-                .username(updatedUser.getUsername())
-                .email(updatedUser.getEmail())
-                .password("HIDDEN")
-                .build();
+        return userMapper.toDto(user);
     }
 
     @Override
