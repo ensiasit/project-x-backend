@@ -3,7 +3,6 @@ package com.ensiasit.projectx.controllers;
 
 import com.ensiasit.projectx.dto.ContestDto;
 import com.ensiasit.projectx.dto.UserContestRoleDto;
-import com.ensiasit.projectx.services.AdminService;
 import com.ensiasit.projectx.services.ContestService;
 import com.ensiasit.projectx.utils.Constants;
 import com.ensiasit.projectx.utils.RoleEnum;
@@ -20,7 +19,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ContestController {
     private final ContestService contestService;
-    private final AdminService adminService;
 
     @PostMapping
     public ContestDto createContest(Principal principal, @Valid @RequestBody ContestDto contest) {

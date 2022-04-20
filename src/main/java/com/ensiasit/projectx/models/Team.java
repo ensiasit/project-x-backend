@@ -15,18 +15,22 @@ import java.util.Set;
 @Data
 @Builder
 public class Team {
-    @OneToMany
-    @JoinColumn(name = "team_id", referencedColumnName = "id")
-    Set<User> members;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(unique = true, length = 50)
     private String name;
+
     @OneToOne
     @JoinColumn(name = "contest_id", referencedColumnName = "id")
     private Contest contest;
+
     @OneToOne
     @JoinColumn(name = "affiliation_id", referencedColumnName = "id")
     private Affiliation affiliation;
+
+    @OneToMany
+    @JoinColumn(name = "team_id", referencedColumnName = "id")
+    private Set<User> members;
 }

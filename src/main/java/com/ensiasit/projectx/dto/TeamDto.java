@@ -17,9 +17,5 @@ public class TeamDto {
     @NotBlank
     private String name;
 
-    private long contestId;
-
     private long affiliationId;
-
-    private String affiliationName;
 }

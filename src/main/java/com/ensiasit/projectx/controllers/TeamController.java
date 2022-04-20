@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.List;
 
 import static com.ensiasit.projectx.utils.Constants.API_PREFIX;
@@ -18,8 +19,8 @@ public class TeamController {
     private final TeamService teamService;
 
     @PostMapping
-    public TeamDto createTeam(@Valid @RequestBody TeamDto team) {
-        return teamService.createTeam(team);
+    public TeamDto createTeam(Principal principal, @Valid @RequestBody TeamDto team) {
+        return teamService.createTeam(principal.getName(), team);
     }
 
     @GetMapping
@@ -33,12 +34,12 @@ public class TeamController {
     }
 
     @DeleteMapping("/{id}")
-    public TeamDto deleteTeam(@PathVariable long id) {
-        return teamService.deleteTeam(id);
+    public TeamDto deleteTeam(Principal principal, @PathVariable long id) {
+        return teamService.deleteTeam(principal.getName(), id);
     }
 
     @PutMapping("/{id}")
-    private TeamDto updateTeam(@PathVariable Long id, @Valid @RequestBody TeamDto payload) {
-        return teamService.updateTeam(id, payload);
+    private TeamDto updateTeam(Principal principal, @PathVariable Long id, @Valid @RequestBody TeamDto payload) {
+        return teamService.updateTeam(principal.getName(), id, payload);
     }
 }
