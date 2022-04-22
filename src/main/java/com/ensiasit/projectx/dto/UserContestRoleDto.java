@@ -13,5 +13,7 @@ import lombok.NoArgsConstructor;
 public class UserContestRoleDto {
     private RoleEnum role;
 
+    private UserDto user;
+
     private ContestDto contest;
 }

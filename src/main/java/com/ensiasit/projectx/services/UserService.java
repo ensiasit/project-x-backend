@@ -16,4 +16,6 @@ public interface UserService {
     List<UserDto> getAll();
 
     UserDto findByEmail(String userEmail);
+
+    UserDto getOneById(String userEmail, long id);
 }

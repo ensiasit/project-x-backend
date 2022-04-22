@@ -41,4 +41,9 @@ public class UserController {
     public UserDto updateCurrentUser(Principal principal, @Valid @RequestBody UserDto userDto) {
         return userService.updateByEmail(principal.getName(), userDto);
     }
+
+    @GetMapping("/{id}")
+    public UserDto getOne(Principal principal, @PathVariable long id) {
+        return userService.getOneById(principal.getName(), id);
+    }
 }

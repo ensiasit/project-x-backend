@@ -80,6 +80,13 @@ public class UserServiceImpl implements UserService {
         return userMapper.toDto(extract(userEmail));
     }
 
+    @Override
+    public UserDto getOneById(String userEmail, long id) {
+        checkAdminAccess(userEmail);
+
+        return userMapper.toDto(extract(id));
+    }
+
     private User extract(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException("Incorrect user email"));

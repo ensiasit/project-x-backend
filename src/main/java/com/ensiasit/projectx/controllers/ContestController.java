@@ -6,6 +6,7 @@ import com.ensiasit.projectx.dto.UserContestRoleDto;
 import com.ensiasit.projectx.services.AdminService;
 import com.ensiasit.projectx.services.ContestService;
 import com.ensiasit.projectx.utils.Constants;
+import com.ensiasit.projectx.utils.RoleEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,5 +50,15 @@ public class ContestController {
     @PutMapping("/{id}")
     public ContestDto updateContest(Principal principal, @PathVariable Long id, @Valid @RequestBody ContestDto payload) {
         return contestService.updateContest(principal.getName(), id, payload);
+    }
+
+    @GetMapping("/{id}/users")
+    public List<UserContestRoleDto> getUserContestRoles(@PathVariable long id) {
+        return contestService.getUserContestRoles(id);
+    }
+
+    @PutMapping("/{contestId}/users/{userId}/{role}")
+    public UserContestRoleDto updateUserContestRole(Principal principal, @PathVariable long contestId, @PathVariable long userId, @PathVariable RoleEnum role) {
+        return contestService.updateUserContestRole(principal.getName(), contestId, userId, role);
     }
 }

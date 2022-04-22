@@ -56,4 +56,9 @@ public class AdminServiceImpl implements AdminService {
     public boolean isAdmin(String userEmail) {
         return adminRepository.existsByUserEmail(userEmail);
     }
+
+    @Override
+    public User getAdmin() {
+        return adminRepository.findAll().get(0).getUser();
+    }
 }
