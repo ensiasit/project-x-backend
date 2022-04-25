@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 
+import static com.ensiasit.projectx.utils.Constants.DEFAULT_ADMIN_USERNAME;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -35,7 +37,7 @@ public class AdminServiceImpl implements AdminService {
             log.info("Admin user already exists.");
         } else {
             User adminUser = User.builder()
-                    .username("Admin")
+                    .username(DEFAULT_ADMIN_USERNAME)
                     .email(adminEmail)
                     .password(encoder.encode(adminPassword))
                     .build();
