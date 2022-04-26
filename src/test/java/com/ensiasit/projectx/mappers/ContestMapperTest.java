@@ -2,6 +2,7 @@ package com.ensiasit.projectx.mappers;
 
 import com.ensiasit.projectx.dto.ContestDto;
 import com.ensiasit.projectx.dto.UserContestRoleDto;
+import com.ensiasit.projectx.dto.UserDto;
 import com.ensiasit.projectx.models.Contest;
 import com.ensiasit.projectx.models.User;
 import com.ensiasit.projectx.models.UserContestRole;
@@ -9,15 +10,20 @@ import com.ensiasit.projectx.utils.RoleEnum;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ContestMapperTest {
+    @Mock
+    private UserMapper userMapper;
+
     @InjectMocks
     private ContestMapper contestMapper;
 
@@ -69,44 +75,22 @@ class ContestMapperTest {
 
     @Test
     void given_user_contest_role_return_dto_when_toUserContestRoleDto() {
-        Contest contest = Contest.builder()
-                .id(1L)
-                .name("name")
-                .startTime(LocalDateTime.now().plusDays(1))
-                .endTime(LocalDateTime.now().plusDays(2))
-                .freezeTime(LocalDateTime.now().plusDays(3))
-                .unfreezeTime(LocalDateTime.now().plusDays(4))
-                .publicScoreboard(false)
-                .build();
+        Contest contest = Contest.builder().id(1L).build();
+        ContestDto contestDto = mock(ContestDto.class);
         User user = mock(User.class);
+        UserDto userDto = mock(UserDto.class);
         UserContestRole userContestRole = UserContestRole.builder()
-                .role(RoleEnum.ROLE_NOTHING)
+                .role(RoleEnum.ROLE_USER)
                 .contest(contest)
                 .user(user)
                 .build();
+
+        when(userMapper.toDto(user)).thenReturn(userDto);
 
         UserContestRoleDto dto = contestMapper.toUserContestRoleDto(userContestRole);
 
         assertThat(dto.getRole()).isEqualTo(userContestRole.getRole());
         assertThat(dto.getContest().getId()).isEqualTo(contest.getId());
-        assertThat(dto.getContest().getName()).isEqualTo(contest.getName());
-        assertThat(dto.getContest().getStartTime()).isEqualTo(contest.getStartTime());
-        assertThat(dto.getContest().getEndTime()).isEqualTo(contest.getEndTime());
-        assertThat(dto.getContest().getFreezeTime()).isEqualTo(contest.getFreezeTime());
-        assertThat(dto.getContest().getUnfreezeTime()).isEqualTo(contest.getUnfreezeTime());
-        assertThat(dto.getContest().isPublicScoreboard()).isEqualTo(contest.isPublicScoreboard());
-        assertThat(dto.getUser()).isNull();
-    }
-
-    @Test
-    void given_contest_dto_and_role_return_dto_when_toUserContestRoleDto() {
-        ContestDto contestDto = mock(ContestDto.class);
-        RoleEnum role = RoleEnum.ROLE_ADMIN;
-
-        UserContestRoleDto dto = contestMapper.toUserContestRoleDto(contestDto, role);
-
-        assertThat(dto.getRole()).isEqualTo(role);
-        assertThat(dto.getContest()).isEqualTo(contestDto);
-        assertThat(dto.getUser()).isNull();
+        assertThat(dto.getUser()).isEqualTo(userDto);
     }
 }

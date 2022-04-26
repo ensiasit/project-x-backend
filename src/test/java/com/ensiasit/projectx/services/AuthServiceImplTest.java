@@ -3,7 +3,6 @@ package com.ensiasit.projectx.services;
 import com.ensiasit.projectx.dto.LoginRequest;
 import com.ensiasit.projectx.dto.LoginResponse;
 import com.ensiasit.projectx.dto.UserDto;
-import com.ensiasit.projectx.exceptions.BadRequestException;
 import com.ensiasit.projectx.mappers.UserMapper;
 import com.ensiasit.projectx.models.User;
 import com.ensiasit.projectx.repositories.UserRepository;
@@ -19,7 +18,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,11 +34,17 @@ class AuthServiceImplTest {
     @Mock
     private UserMapper userMapper;
 
+    @Mock
+    private AdminService adminService;
+
+    @Mock
+    private UserService userService;
+
     @InjectMocks
     private AuthServiceImpl authService;
 
     @Test
-    void given_login_request_authenticate_user_when_authenticateUser() {
+    void authenticateUser() {
         Authentication authentication = mock(Authentication.class);
         String token = "token";
         LoginRequest request = LoginRequest.builder()
@@ -67,37 +71,15 @@ class AuthServiceImplTest {
     }
 
     @Test
-    void given_not_taken_email_should_register_user_when_registerUser() {
-        UserDto dto = UserDto.builder()
-                .email("email")
-                .build();
-        User user = mock(User.class);
+    void registerUser() {
+        UserDto dto = mock(UserDto.class);
+        User adminUser = User.builder().email("email").build();
 
-        when(userRepository.existsByEmail(dto.getEmail())).thenReturn(false);
-        when(userMapper.fromDto(dto)).thenReturn(user);
-        when(userRepository.save(user)).thenReturn(user);
-        when(userMapper.toDto(user)).thenReturn(dto);
+        when(adminService.getAdmin()).thenReturn(adminUser);
+        when(userService.addOne(adminUser.getEmail(), dto)).thenReturn(dto);
 
         UserDto userDto = authService.registerUser(dto);
 
-        verify(userMapper).fromDto(dto);
-        verify(userRepository).save(user);
-        verify(userMapper).toDto(user);
-
         assertThat(userDto).isEqualTo(dto);
-    }
-
-    @Test
-    void given_taken_email_should_throw_exception_when_registerUser() {
-        UserDto dto = UserDto.builder()
-                .email("email")
-                .build();
-
-        when(userRepository.existsByEmail(dto.getEmail())).thenReturn(true);
-
-        assertThrows(
-                BadRequestException.class,
-                () -> authService.registerUser(dto)
-        );
     }
 }

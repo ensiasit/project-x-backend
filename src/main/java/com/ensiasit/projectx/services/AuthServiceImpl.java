@@ -3,7 +3,6 @@ package com.ensiasit.projectx.services;
 import com.ensiasit.projectx.dto.LoginRequest;
 import com.ensiasit.projectx.dto.LoginResponse;
 import com.ensiasit.projectx.dto.UserDto;
-import com.ensiasit.projectx.exceptions.BadRequestException;
 import com.ensiasit.projectx.mappers.UserMapper;
 import com.ensiasit.projectx.models.User;
 import com.ensiasit.projectx.repositories.UserRepository;
@@ -22,6 +21,8 @@ public class AuthServiceImpl implements AuthService {
     private final JwtUtils jwtUtils;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final AdminService adminService;
+    private final UserService userService;
 
     @Override
     public LoginResponse authenticateUser(LoginRequest loginRequest) {
@@ -37,14 +38,8 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public UserDto registerUser(UserDto payload) {
-        if (userRepository.existsByEmail(payload.getEmail())) {
-            throw new BadRequestException("Email already taken");
-        }
+        User adminUser = adminService.getAdmin();
 
-        User user = userMapper.fromDto(payload);
-
-        user = userRepository.save(user);
-
-        return userMapper.toDto(user);
+        return userService.addOne(adminUser.getEmail(), payload);
     }
 }
