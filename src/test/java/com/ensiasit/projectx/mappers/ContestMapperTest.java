@@ -76,7 +76,6 @@ class ContestMapperTest {
     @Test
     void given_user_contest_role_return_dto_when_toUserContestRoleDto() {
         Contest contest = Contest.builder().id(1L).build();
-        ContestDto contestDto = mock(ContestDto.class);
         User user = mock(User.class);
         UserDto userDto = mock(UserDto.class);
         UserContestRole userContestRole = UserContestRole.builder()

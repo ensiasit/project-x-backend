@@ -1,11 +1,7 @@
 package com.ensiasit.projectx.services;
 
-import com.ensiasit.projectx.dto.LoginRequest;
-import com.ensiasit.projectx.dto.LoginResponse;
-import com.ensiasit.projectx.dto.UserDto;
-import com.ensiasit.projectx.mappers.UserMapper;
-import com.ensiasit.projectx.models.User;
-import com.ensiasit.projectx.repositories.UserRepository;
+import com.ensiasit.projectx.dto.LoginRequestDto;
+import com.ensiasit.projectx.dto.LoginResponseDto;
 import com.ensiasit.projectx.security.jwt.JwtUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,26 +24,15 @@ class AuthServiceImplTest {
     @Mock
     private JwtUtils jwtUtils;
 
-    @Mock
-    private UserRepository userRepository;
-
-    @Mock
-    private UserMapper userMapper;
-
-    @Mock
-    private AdminService adminService;
-
-    @Mock
-    private UserService userService;
 
     @InjectMocks
-    private AuthServiceImpl authService;
+    private AuthenticationServiceImpl authService;
 
     @Test
     void authenticateUser() {
         Authentication authentication = mock(Authentication.class);
         String token = "token";
-        LoginRequest request = LoginRequest.builder()
+        LoginRequestDto request = LoginRequestDto.builder()
                 .email("email")
                 .password("password")
                 .build();
@@ -55,7 +40,7 @@ class AuthServiceImplTest {
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
         when(jwtUtils.generateJwtToken(authentication)).thenReturn(token);
 
-        LoginResponse response = authService.authenticateUser(request);
+        LoginResponseDto response = authService.authenticate(request);
 
         ArgumentCaptor<UsernamePasswordAuthenticationToken> authenticationCaptor = ArgumentCaptor.forClass(UsernamePasswordAuthenticationToken.class);
 
@@ -68,18 +53,5 @@ class AuthServiceImplTest {
         assertThat(usernamePasswordAuthentication.getCredentials()).isEqualTo(request.getPassword());
 
         assertThat(response.getToken()).isEqualTo(token);
-    }
-
-    @Test
-    void registerUser() {
-        UserDto dto = mock(UserDto.class);
-        User adminUser = User.builder().email("email").build();
-
-        when(adminService.getAdmin()).thenReturn(adminUser);
-        when(userService.addOne(adminUser.getEmail(), dto)).thenReturn(dto);
-
-        UserDto userDto = authService.registerUser(dto);
-
-        assertThat(userDto).isEqualTo(dto);
     }
 }

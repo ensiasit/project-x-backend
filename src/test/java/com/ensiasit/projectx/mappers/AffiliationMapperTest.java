@@ -1,7 +1,7 @@
 package com.ensiasit.projectx.mappers;
 
-import com.ensiasit.projectx.dto.AffiliationRequest;
-import com.ensiasit.projectx.dto.AffiliationResponse;
+import com.ensiasit.projectx.dto.AffiliationRequestDto;
+import com.ensiasit.projectx.dto.AffiliationResponseDto;
 import com.ensiasit.projectx.exceptions.ServerErrorException;
 import com.ensiasit.projectx.models.Affiliation;
 import org.junit.jupiter.api.Test;
@@ -31,7 +31,7 @@ class AffiliationMapperTest {
                 .logo(new byte[]{})
                 .build();
 
-        AffiliationResponse affiliationResponse = affiliationMapper.toDto(affiliation);
+        AffiliationResponseDto affiliationResponse = affiliationMapper.toDto(affiliation);
 
         assertThat(affiliationResponse.getId()).isEqualTo(affiliation.getId());
         assertThat(affiliationResponse.getName()).isEqualTo(affiliation.getName());
@@ -43,7 +43,7 @@ class AffiliationMapperTest {
     void given_dto_with_non_empty_logo_should_return_affiliation_when_fromDto() throws IOException {
         byte[] logoBytes = new byte[]{};
         MultipartFile logo = mock(MultipartFile.class);
-        AffiliationRequest affiliationRequest = AffiliationRequest.builder()
+        AffiliationRequestDto affiliationRequest = AffiliationRequestDto.builder()
                 .id(1L)
                 .name("name")
                 .country("country")
@@ -63,7 +63,7 @@ class AffiliationMapperTest {
     @Test
     void given_dto_with_non_empty_invalid_logo_should_throw_exception_when_fromDto() throws IOException {
         MultipartFile logo = mock(MultipartFile.class);
-        AffiliationRequest affiliationRequest = AffiliationRequest.builder()
+        AffiliationRequestDto affiliationRequest = AffiliationRequestDto.builder()
                 .id(1L)
                 .name("name")
                 .country("country")
@@ -80,7 +80,7 @@ class AffiliationMapperTest {
 
     @Test
     void given_dto_with_empty_logo_should_return_affiliation_when_fromDto() {
-        AffiliationRequest affiliationRequest = AffiliationRequest.builder()
+        AffiliationRequestDto affiliationRequest = AffiliationRequestDto.builder()
                 .id(1L)
                 .name("name")
                 .country("country")

@@ -3,10 +3,11 @@ package com.ensiasit.projectx.controllers;
 
 import com.ensiasit.projectx.dto.ContestDto;
 import com.ensiasit.projectx.dto.UserContestRoleDto;
-import com.ensiasit.projectx.services.AdminService;
 import com.ensiasit.projectx.services.ContestService;
 import com.ensiasit.projectx.utils.Constants;
 import com.ensiasit.projectx.utils.RoleEnum;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,51 +15,59 @@ import javax.validation.Valid;
 import java.security.Principal;
 import java.util.List;
 
+@Api(tags = "/contests")
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping(Constants.API_PREFIX + "/contests")
 @RequiredArgsConstructor
 public class ContestController {
     private final ContestService contestService;
-    private final AdminService adminService;
 
-    @PostMapping
-    public ContestDto createContest(Principal principal, @Valid @RequestBody ContestDto contest) {
-            return contestService.createContest(principal.getName(), contest);
-    }
-
+    @ApiOperation("Returns all contests")
     @GetMapping
-    public List<ContestDto> getAllContests() {
+    public List<ContestDto> getAll() {
         return contestService.getAll();
     }
 
-    @GetMapping("/current")
-    public List<UserContestRoleDto> getUserContests(Principal principal) {
-        return contestService.getAllUserContests(principal.getName());
-    }
-
+    @ApiOperation("Returns a contest")
     @GetMapping("/{id}")
-    public ContestDto getContest(@PathVariable long id) {
-        return contestService.getContest(id);
+    public ContestDto getOne(@PathVariable long id) {
+        return contestService.getOne(id);
     }
 
+    @ApiOperation("Creates a contest")
+    @PostMapping
+    public ContestDto addOne(@Valid @RequestBody ContestDto contest) {
+        return contestService.addOne(contest);
+    }
+
+    @ApiOperation("Deletes a contest")
     @DeleteMapping("/{id}")
-    public ContestDto deleteContest(Principal principal, @PathVariable long id) {
-        return contestService.deleteContest(principal.getName(), id);
+    public ContestDto deleteOne(@PathVariable long id) {
+        return contestService.deleteOne(id);
     }
 
+    @ApiOperation("Updates a contest")
     @PutMapping("/{id}")
-    public ContestDto updateContest(Principal principal, @PathVariable Long id, @Valid @RequestBody ContestDto payload) {
-        return contestService.updateContest(principal.getName(), id, payload);
+    public ContestDto updateOne(@PathVariable Long id, @Valid @RequestBody ContestDto payload) {
+        return contestService.updateOne(id, payload);
     }
 
-    @GetMapping("/{id}/users")
-    public List<UserContestRoleDto> getUserContestRoles(@PathVariable long id) {
-        return contestService.getUserContestRoles(id);
+    @ApiOperation("Returns all users roles for a contest")
+    @GetMapping("/{id}/roles")
+    public List<UserContestRoleDto> getAllRoles(@PathVariable long id) {
+        return contestService.getAllRoles(id);
     }
 
-    @PutMapping("/{contestId}/users/{userId}/{role}")
-    public UserContestRoleDto updateUserContestRole(Principal principal, @PathVariable long contestId, @PathVariable long userId, @PathVariable RoleEnum role) {
-        return contestService.updateUserContestRole(principal.getName(), contestId, userId, role);
+    @ApiOperation("Returns all contests roles for the currently logged in user")
+    @GetMapping("/roles")
+    public List<UserContestRoleDto> getAllRolesForCurrentUser(Principal principal) {
+        return contestService.getAllRolesByUserEmail(principal.getName());
+    }
+
+    @ApiOperation("Updates the role of a user in a contest")
+    @PutMapping("/{contestId}/roles/users/{userId}/{role}")
+    public UserContestRoleDto updateRole(Principal principal, @PathVariable long contestId, @PathVariable long userId, @PathVariable RoleEnum role) {
+        return contestService.updateRole(principal.getName(), contestId, userId, role);
     }
 }
