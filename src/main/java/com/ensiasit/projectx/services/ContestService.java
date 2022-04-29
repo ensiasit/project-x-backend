@@ -9,17 +9,17 @@ import java.util.List;
 public interface ContestService {
     List<ContestDto> getAll();
 
-    ContestDto createContest(String userEmail, ContestDto contest);
+    ContestDto getOne(long id);
 
-    ContestDto getContest(long id);
+    ContestDto addOne(ContestDto contest);
 
-    ContestDto deleteContest(String userEmail, long id);
+    ContestDto deleteOne(long id);
 
-    List<UserContestRoleDto> getAllUserContests(String userEmail);
+    ContestDto updateOne(long id, ContestDto payload);
 
-    ContestDto updateContest(String userEmail, long id, ContestDto payload);
+    List<UserContestRoleDto> getAllRoles(long id);
 
-    List<UserContestRoleDto> getUserContestRoles(long id);
+    List<UserContestRoleDto> getAllRolesByUserEmail(String email);
 
-    UserContestRoleDto updateUserContestRole(String principalEmail, long contestId, long userId, RoleEnum role);
+    UserContestRoleDto updateRole(String principalEmail, long contestId, long userId, RoleEnum role);
 }

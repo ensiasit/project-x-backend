@@ -13,7 +13,7 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 @Data
 @Builder
-public class AffiliationRequest {
+public class AffiliationRequestDto {
     private long id;
 
     @NotBlank

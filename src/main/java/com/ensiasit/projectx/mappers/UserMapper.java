@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import static com.ensiasit.projectx.utils.Constants.HIDDEN_PASSWORD;
+
 @Component
 @RequiredArgsConstructor
 public class UserMapper {
@@ -26,7 +28,7 @@ public class UserMapper {
                 .id(user.getId())
                 .email(user.getEmail())
                 .username(user.getUsername())
-                .password("**HIDDEN**")
+                .password(HIDDEN_PASSWORD)
                 .admin(adminService.isAdmin(user.getEmail()))
                 .build();
     }

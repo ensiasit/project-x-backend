@@ -12,7 +12,7 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 @Data
 @Builder
-public class LoginRequest {
+public class LoginRequestDto {
     @NotBlank
     @Email
     private String email;

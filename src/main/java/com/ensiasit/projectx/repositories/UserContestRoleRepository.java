@@ -11,6 +11,8 @@ public interface UserContestRoleRepository extends JpaRepository<UserContestRole
 
     void deleteAllByContestId(long contestId);
 
+    void deleteAllByUserId(long userId);
+
     List<UserContestRole> findAllByContestId(long id);
 
     Optional<UserContestRole> findByContestIdAndUserId(long contestId, long userId);

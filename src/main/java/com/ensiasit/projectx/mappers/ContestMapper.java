@@ -4,11 +4,14 @@ import com.ensiasit.projectx.dto.ContestDto;
 import com.ensiasit.projectx.dto.UserContestRoleDto;
 import com.ensiasit.projectx.models.Contest;
 import com.ensiasit.projectx.models.UserContestRole;
-import com.ensiasit.projectx.utils.RoleEnum;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class ContestMapper {
+    private final UserMapper userMapper;
+
     public Contest fromContestDto(ContestDto contestDto) {
         return Contest.builder()
                 .id(contestDto.getId())
@@ -35,15 +38,9 @@ public class ContestMapper {
 
     public UserContestRoleDto toUserContestRoleDto(UserContestRole userContestRole) {
         return UserContestRoleDto.builder()
+                .user(userMapper.toDto(userContestRole.getUser()))
                 .role(userContestRole.getRole())
                 .contest(toContestDto(userContestRole.getContest()))
-                .build();
-    }
-
-    public UserContestRoleDto toUserContestRoleDto(ContestDto contestDto, RoleEnum role) {
-        return UserContestRoleDto.builder()
-                .role(role)
-                .contest(contestDto)
                 .build();
     }
 }
