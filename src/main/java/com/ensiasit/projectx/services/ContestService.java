@@ -1,6 +1,7 @@
 package com.ensiasit.projectx.services;
 
 import com.ensiasit.projectx.dto.ContestDto;
+import com.ensiasit.projectx.dto.TeamResponse;
 import com.ensiasit.projectx.dto.UserContestRoleDto;
 import com.ensiasit.projectx.utils.RoleEnum;
 
@@ -22,4 +23,8 @@ public interface ContestService {
     List<UserContestRoleDto> getUserContestRoles(long id);
 
     UserContestRoleDto updateUserContestRole(String principalEmail, long contestId, long userId, RoleEnum role);
+
+    List<TeamResponse> getRegisteredTeams(long id);
+
+    boolean userHasNoWriteAccess(String userEmail, long contestId);
 }

@@ -59,7 +59,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/api/v1/auth/register",
                         "/swagger-ui/**",
                         "/api/v1/contests",
-                        "/api/v1/affiliations"
+                        "/api/v1/affiliations",
+                        "/api/v1/teams"
                 ).permitAll()
                 .anyRequest().authenticated();
 

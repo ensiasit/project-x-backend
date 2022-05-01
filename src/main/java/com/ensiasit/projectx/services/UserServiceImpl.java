@@ -1,14 +1,17 @@
 package com.ensiasit.projectx.services;
 
+import com.ensiasit.projectx.annotations.SecureAdmin;
 import com.ensiasit.projectx.dto.UserDto;
-import com.ensiasit.projectx.exceptions.ForbiddenException;
 import com.ensiasit.projectx.exceptions.NotFoundException;
 import com.ensiasit.projectx.mappers.UserMapper;
 import com.ensiasit.projectx.models.User;
+import com.ensiasit.projectx.repositories.UserContestRoleRepository;
 import com.ensiasit.projectx.repositories.UserRepository;
+import com.ensiasit.projectx.utils.Helpers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -16,13 +19,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final UserContestRoleRepository userContestRoleRepository;
     private final PasswordEncoder encoder;
     private final UserMapper userMapper;
-    private final AdminService adminService;
+    private final Helpers helpers;
 
     @Override
     public UserDto updateByEmail(String userEmail, UserDto userDto) {
-        User user = extract(userEmail);
+        User user = extractByEmail(userEmail);
 
         user.setEmail(userDto.getEmail());
         user.setUsername(userDto.getUsername());
@@ -33,31 +37,30 @@ public class UserServiceImpl implements UserService {
         return userMapper.toDto(user);
     }
 
+    @SecureAdmin
     @Override
     public UserDto addOne(String userEmail, UserDto payload) {
-        checkAdminAccess(userEmail);
-
         User user = userRepository.save(userMapper.fromDto(payload));
 
         return userMapper.toDto(user);
     }
 
+    @SecureAdmin
     @Override
+    @Transactional
     public UserDto deleteOne(String userEmail, long id) {
-        checkAdminAccess(userEmail);
+        User user = helpers.extractById(id, userRepository);
 
-        User user = extract(id);
-
+        userContestRoleRepository.deleteAllByUserId(id);
         userRepository.delete(user);
 
         return userMapper.toDto(user);
     }
 
+    @SecureAdmin
     @Override
     public UserDto updateOne(String userEmail, long id, UserDto payload) {
-        checkAdminAccess(userEmail);
-
-        User user = extract(id);
+        User user = helpers.extractById(id, userRepository);
 
         user.setUsername(payload.getUsername());
         user.setEmail(payload.getEmail());
@@ -77,29 +80,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto findByEmail(String userEmail) {
-        return userMapper.toDto(extract(userEmail));
+        return userMapper.toDto(extractByEmail(userEmail));
     }
 
+    @SecureAdmin
     @Override
     public UserDto getOneById(String userEmail, long id) {
-        checkAdminAccess(userEmail);
-
-        return userMapper.toDto(extract(id));
+        return userMapper.toDto(helpers.extractById(id, userRepository));
     }
 
-    private User extract(String email) {
+    private User extractByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException("Incorrect user email"));
-    }
-
-    private User extract(long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Incorrect user id"));
-    }
-
-    private void checkAdminAccess(String userEmail) {
-        if (!adminService.isAdmin(userEmail)) {
-            throw new ForbiddenException("User is not admin");
-        }
     }
 }

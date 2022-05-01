@@ -2,8 +2,8 @@ package com.ensiasit.projectx.controllers;
 
 
 import com.ensiasit.projectx.dto.ContestDto;
+import com.ensiasit.projectx.dto.TeamResponse;
 import com.ensiasit.projectx.dto.UserContestRoleDto;
-import com.ensiasit.projectx.services.AdminService;
 import com.ensiasit.projectx.services.ContestService;
 import com.ensiasit.projectx.utils.Constants;
 import com.ensiasit.projectx.utils.RoleEnum;
@@ -20,7 +20,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ContestController {
     private final ContestService contestService;
-    private final AdminService adminService;
 
     @PostMapping
     public ContestDto createContest(Principal principal, @Valid @RequestBody ContestDto contest) {
@@ -48,7 +47,7 @@ public class ContestController {
     }
 
     @PutMapping("/{id}")
-    public ContestDto updateContest(Principal principal, @PathVariable Long id, @Valid @RequestBody ContestDto payload) {
+    public ContestDto updateContest(Principal principal, @PathVariable long id, @Valid @RequestBody ContestDto payload) {
         return contestService.updateContest(principal.getName(), id, payload);
     }
 
@@ -60,5 +59,10 @@ public class ContestController {
     @PutMapping("/{contestId}/users/{userId}/{role}")
     public UserContestRoleDto updateUserContestRole(Principal principal, @PathVariable long contestId, @PathVariable long userId, @PathVariable RoleEnum role) {
         return contestService.updateUserContestRole(principal.getName(), contestId, userId, role);
+    }
+
+    @GetMapping("/{id}/teams")
+    public List<TeamResponse> getRegisteredTeams(@PathVariable long id) {
+        return contestService.getRegisteredTeams(id);
     }
 }

@@ -1,29 +1,27 @@
 package com.ensiasit.projectx.dto;
 
+import com.ensiasit.projectx.models.Affiliation;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Builder
-public class UserDto {
+public class TeamResponse {
     private long id;
 
     @NotBlank
-    private String username;
+    private String name;
 
-    @NotBlank
-    @Email
-    private String email;
+    private Affiliation affiliation;
 
-    @NotBlank
-    private String password;
+    private ContestDto contest;
 
-    private boolean admin;
+    private Set<String> membersEmails;
 }

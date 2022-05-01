@@ -12,18 +12,8 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 @Data
 @Builder
-public class UserDto {
-    private long id;
-
-    @NotBlank
-    private String username;
-
+public class MemberRequest {
     @NotBlank
     @Email
     private String email;
-
-    @NotBlank
-    private String password;
-
-    private boolean admin;
 }

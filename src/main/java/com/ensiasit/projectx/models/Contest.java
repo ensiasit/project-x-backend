@@ -1,12 +1,10 @@
 package com.ensiasit.projectx.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @Table(name = "contests")
@@ -14,6 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Data
 @Builder
+@EqualsAndHashCode(exclude = "teams")
 public class Contest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,4 +31,7 @@ public class Contest {
 
     @Column(nullable = false)
     private boolean publicScoreboard;
+
+    @OneToMany(mappedBy = "contest")
+    private Set<Team> teams;
 }

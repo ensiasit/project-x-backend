@@ -1,18 +1,23 @@
 package com.ensiasit.projectx.services;
 
+import com.ensiasit.projectx.annotations.SecureAdmin;
 import com.ensiasit.projectx.dto.ContestDto;
+import com.ensiasit.projectx.dto.TeamResponse;
 import com.ensiasit.projectx.dto.UserContestRoleDto;
 import com.ensiasit.projectx.exceptions.BadRequestException;
 import com.ensiasit.projectx.exceptions.ForbiddenException;
 import com.ensiasit.projectx.exceptions.NotFoundException;
 import com.ensiasit.projectx.mappers.ContestMapper;
+import com.ensiasit.projectx.mappers.TeamMapper;
 import com.ensiasit.projectx.mappers.UserMapper;
 import com.ensiasit.projectx.models.Contest;
 import com.ensiasit.projectx.models.User;
 import com.ensiasit.projectx.models.UserContestRole;
 import com.ensiasit.projectx.repositories.ContestRepository;
+import com.ensiasit.projectx.repositories.TeamRepository;
 import com.ensiasit.projectx.repositories.UserContestRoleRepository;
 import com.ensiasit.projectx.repositories.UserRepository;
+import com.ensiasit.projectx.utils.Helpers;
 import com.ensiasit.projectx.utils.RoleEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -28,11 +32,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ContestServiceImpl implements ContestService {
     private final ContestRepository contestRepository;
+    private final TeamRepository teamRepository;
     private final UserContestRoleRepository userContestRoleRepository;
     private final AdminService adminService;
     private final ContestMapper contestMapper;
+    private final TeamMapper teamMapper;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final Helpers helpers;
 
     @Override
     public List<ContestDto> getAll() {
@@ -41,12 +48,9 @@ public class ContestServiceImpl implements ContestService {
                 .toList();
     }
 
+    @SecureAdmin
     @Override
     public ContestDto createContest(String userEmail, ContestDto contestDto) {
-        if (!adminService.isAdmin(userEmail)) {
-            throw new ForbiddenException("User has no write access.");
-        }
-
         Contest contest = contestRepository.save(contestMapper.fromContestDto(contestDto));
 
         return contestMapper.toContestDto(contest);
@@ -54,21 +58,19 @@ public class ContestServiceImpl implements ContestService {
 
     @Override
     public ContestDto getContest(long id) {
-        Contest contest = extractContest(id);
+        Contest contest = helpers.extractById(id, contestRepository);
 
         return contestMapper.toContestDto(contest);
     }
 
+    @SecureAdmin
     @Transactional
     @Override
     public ContestDto deleteContest(String userEmail, long id) {
-        Contest contest = extractContest(id);
-
-        if (userHasNoWriteAccess(userEmail, id)) {
-            throw new ForbiddenException("User has no write access.");
-        }
+        Contest contest = helpers.extractById(id, contestRepository);
 
         userContestRoleRepository.deleteAllByContestId(id);
+        teamRepository.deleteAllByContestId(id);
         contestRepository.deleteById(id);
 
         return contestMapper.toContestDto(contest);
@@ -89,7 +91,7 @@ public class ContestServiceImpl implements ContestService {
 
     @Override
     public ContestDto updateContest(String userEmail, long id, ContestDto payload) {
-        Contest contest = extractContest(id);
+        Contest contest = helpers.extractById(id, contestRepository);
 
         if (userHasNoWriteAccess(userEmail, id)) {
             throw new ForbiddenException("User has no write access.");
@@ -116,7 +118,7 @@ public class ContestServiceImpl implements ContestService {
 
     @Override
     public List<UserContestRoleDto> getUserContestRoles(long id) {
-        ContestDto contest = contestMapper.toContestDto(extractContest(id));
+        ContestDto contest = contestMapper.toContestDto(helpers.extractById(id, contestRepository));
         User admin = adminService.getAdmin();
 
         final Map<String, UserContestRole> userContestRoles = userContestRoleRepository.findAllByContestId(id)
@@ -158,23 +160,15 @@ public class ContestServiceImpl implements ContestService {
             }
         }
 
-        Optional<Contest> contest = contestRepository.findById(contestId);
+        Contest contest = helpers.extractById(contestId, contestRepository);
 
-        if (contest.isEmpty()) {
-            throw new BadRequestException("Incorrect contest id.");
-        }
-
-        Optional<User> user = userRepository.findById(userId);
-
-        if (user.isEmpty()) {
-            throw new BadRequestException("Incorrect user email.");
-        }
+        User user = helpers.extractById(userId, userRepository);
 
         UserContestRole userContestRole = userContestRoleRepository
                 .findByContestIdAndUserId(contestId, userId)
                 .orElse(UserContestRole.builder()
-                        .contest(contest.get())
-                        .user(user.get())
+                        .contest(contest)
+                        .user(user)
                         .build());
 
         userContestRole.setRole(role);
@@ -184,14 +178,12 @@ public class ContestServiceImpl implements ContestService {
         return contestMapper.toUserContestRoleDto(userContestRole);
     }
 
-    private Contest extractContest(long id) {
-        Optional<Contest> contestOptional = contestRepository.findById(id);
+    @Override
+    public List<TeamResponse> getRegisteredTeams(long id) {
 
-        if (contestOptional.isEmpty()) {
-            throw new NotFoundException("Incorrect contest id");
-        }
-
-        return contestOptional.get();
+        return helpers.extractById(id, contestRepository).getTeams().stream()
+                .map(teamMapper::toTeamDto)
+                .toList();
     }
 
     private UserContestRole extractUserContestRole(long contestId, String userEmail) {
@@ -199,7 +191,7 @@ public class ContestServiceImpl implements ContestService {
                 .orElseThrow(() -> new NotFoundException("Incorrect contest id or user email"));
     }
 
-    private boolean userHasNoWriteAccess(String userEmail, long contestId) {
+    public boolean userHasNoWriteAccess(String userEmail, long contestId) {
         if (adminService.isAdmin(userEmail)) {
             return false;
         }

@@ -1,13 +1,9 @@
 package com.ensiasit.projectx.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -15,19 +11,19 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EqualsAndHashCode(exclude = "teams")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
     private String username;
 
-    @NotBlank
-    @Email
     @Column(unique = true, length = 50)
     private String email;
 
-    @NotBlank
     private String password;
+
+    @ManyToMany(mappedBy = "members")
+    private Set<Team> teams;
 }
