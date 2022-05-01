@@ -1,84 +1,85 @@
 package com.ensiasit.projectx.services;
 
-import com.ensiasit.projectx.dto.TeamDto;
+import com.ensiasit.projectx.dto.MemberRequest;
+import com.ensiasit.projectx.dto.MemberResponse;
+import com.ensiasit.projectx.dto.TeamRequest;
+import com.ensiasit.projectx.dto.TeamResponse;
 import com.ensiasit.projectx.exceptions.BadRequestException;
 import com.ensiasit.projectx.exceptions.ForbiddenException;
-import com.ensiasit.projectx.exceptions.NotFoundException;
 import com.ensiasit.projectx.mappers.TeamMapper;
 import com.ensiasit.projectx.models.Affiliation;
 import com.ensiasit.projectx.models.Team;
+import com.ensiasit.projectx.models.User;
 import com.ensiasit.projectx.models.UserContestRole;
 import com.ensiasit.projectx.repositories.AffiliationRepository;
 import com.ensiasit.projectx.repositories.TeamRepository;
 import com.ensiasit.projectx.repositories.UserContestRoleRepository;
+import com.ensiasit.projectx.repositories.UserRepository;
+import com.ensiasit.projectx.utils.Helpers;
 import com.ensiasit.projectx.utils.RoleEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class TeamServiceImpl implements TeamService {
     private final TeamRepository teamRepository;
-    private final UserContestRoleRepository userContestRoleRepository;
     private final AffiliationRepository affiliationRepository;
-    private final AdminService adminService;
+
+    private final UserContestRoleRepository userContestRoleRepository;
+    private final UserRepository userRepository;
+    private final ContestService contestService;
     private final TeamMapper teamMapper;
+    private final Helpers helpers;
 
     @Override
-    public List<TeamDto> getAll() {
+    public List<TeamResponse> getAll() {
         return teamRepository.findAll().stream()
                 .map(teamMapper::toTeamDto)
                 .toList();
     }
 
     @Override
-    public TeamDto createTeam(String userEmail, TeamDto teamDto) {
-        if (!adminService.isAdmin(userEmail)) {
+    public TeamResponse createTeam(String userEmail, TeamRequest teamDto) {
+        if (contestService.userHasNoWriteAccess(userEmail, teamDto.getContestId())) {
             throw new ForbiddenException("User has no write access.");
         }
-
         Team team = teamRepository.save(teamMapper.fromTeamDto(teamDto));
 
         return teamMapper.toTeamDto(team);
     }
 
     @Override
-    public TeamDto getTeam(long id) {
-        Team team = extractTeam(id);
+    public TeamResponse getTeam(long id) {
+        Team team = helpers.extractById(id, teamRepository);
 
         return teamMapper.toTeamDto(team);
     }
 
     @Override
-    public TeamDto deleteTeam(String userEmail, long id) {
-        if (userHasNoWriteAccess(userEmail, id)) {
+    public TeamResponse deleteTeam(String userEmail, long id) {
+        Team team = helpers.extractById(id, teamRepository);
+
+        if (contestService.userHasNoWriteAccess(userEmail, team.getContest().getId())) {
             throw new ForbiddenException("User has no write access.");
         }
-
-        Team team = extractTeam(id);
         teamRepository.deleteById(id);
 
         return teamMapper.toTeamDto(team);
     }
 
     @Override
-    public TeamDto updateTeam(String userEmail, long id, TeamDto payload) {
-        if (userHasNoWriteAccess(userEmail, id)) {
+    public TeamResponse updateTeam(String userEmail, long id, TeamRequest payload) {
+        if (contestService.userHasNoWriteAccess(userEmail, payload.getContestId())) {
             throw new ForbiddenException("User has no write access.");
         }
 
-        Team team = extractTeam(id);
-
-        Optional<Affiliation> optionalAffiliation = affiliationRepository.findById(payload.getAffiliationId());
-
-        if (optionalAffiliation.isEmpty()) {
-            throw new BadRequestException("Incorrect affiliation id");
-        }
-
-        Affiliation affiliation = optionalAffiliation.get();
+        Team team = helpers.extractById(id, teamRepository);
+        Affiliation affiliation = helpers.extractById(payload.getAffiliationId(), affiliationRepository);
 
         team.setName(payload.getName());
         team.setAffiliation(affiliation);
@@ -87,26 +88,31 @@ public class TeamServiceImpl implements TeamService {
         return teamMapper.toTeamDto(team);
     }
 
-    private Team extractTeam(long id) {
-        Optional<Team> teamOptional = teamRepository.findById(id);
+    @Override
+    public TeamResponse addMember(String userEmail, long id, MemberRequest member) {
+        Team team = helpers.extractById(id, teamRepository);
 
-        if (teamOptional.isEmpty()) {
-            throw new NotFoundException("Incorrect team id");
+        if (contestService.userHasNoWriteAccess(userEmail, team.getContest().getId())) {
+            throw new ForbiddenException("User has no write access.");
         }
 
-        return teamOptional.get();
-    }
-
-    private boolean userHasNoWriteAccess(String userEmail, long contestId) {
-        if (adminService.isAdmin(userEmail)) {
-            return false;
+        Optional<User> optionalUser = userRepository.findByEmail(member.getEmail());
+        if (optionalUser.isEmpty()) {
+            throw new BadRequestException("Incorrect member email.");
         }
+        User user = optionalUser.get();
 
-        List<UserContestRole> userContestRoles = userContestRoleRepository.findAllByUserEmail(userEmail);
+        team.getMembers().add(user);
+        user.getTeams().add(team);
 
-        return userContestRoles.stream()
-                .filter(userContestRole -> userContestRole.getContest().getId() == contestId)
-                .noneMatch(userContestRole ->
-                        userContestRole.getRole().equals(RoleEnum.ROLE_ADMIN) || userContestRole.getRole().equals(RoleEnum.ROLE_MODERATOR));
+        teamRepository.save(team);
+        userRepository.save(user);
+        userContestRoleRepository.save(UserContestRole.builder()
+                .user(user)
+                .contest(team.getContest())
+                .role(RoleEnum.ROLE_USER)
+                .build());
+
+        return teamMapper.toTeamDto(team);
     }
 }

@@ -1,17 +1,22 @@
 package com.ensiasit.projectx.services;
 
-import com.ensiasit.projectx.dto.TeamDto;
+import com.ensiasit.projectx.dto.MemberRequest;
+import com.ensiasit.projectx.dto.MemberResponse;
+import com.ensiasit.projectx.dto.TeamRequest;
+import com.ensiasit.projectx.dto.TeamResponse;
 
 import java.util.List;
 
 public interface TeamService {
-    List<TeamDto> getAll();
+    List<TeamResponse> getAll();
 
-    TeamDto createTeam(String userEmail, TeamDto team);
+    TeamResponse createTeam(String userEmail, TeamRequest team);
 
-    TeamDto getTeam(long id);
+    TeamResponse getTeam(long id);
 
-    TeamDto deleteTeam(String userEmail, long id);
+    TeamResponse deleteTeam(String userEmail, long id);
 
-    TeamDto updateTeam(String userEmail, long id, TeamDto payload);
+    TeamResponse updateTeam(String userEmail, long id, TeamRequest payload);
+
+    TeamResponse addMember(String userEmail, long id, MemberRequest member);
 }

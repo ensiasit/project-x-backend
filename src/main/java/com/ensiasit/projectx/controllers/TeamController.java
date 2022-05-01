@@ -1,6 +1,9 @@
 package com.ensiasit.projectx.controllers;
 
-import com.ensiasit.projectx.dto.TeamDto;
+import com.ensiasit.projectx.dto.MemberRequest;
+import com.ensiasit.projectx.dto.MemberResponse;
+import com.ensiasit.projectx.dto.TeamRequest;
+import com.ensiasit.projectx.dto.TeamResponse;
 import com.ensiasit.projectx.services.TeamService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -19,27 +22,32 @@ public class TeamController {
     private final TeamService teamService;
 
     @PostMapping
-    public TeamDto createTeam(Principal principal, @Valid @RequestBody TeamDto team) {
+    public TeamResponse createTeam(Principal principal, @Valid @RequestBody TeamRequest team) {
         return teamService.createTeam(principal.getName(), team);
     }
 
     @GetMapping
-    public List<TeamDto> getAllTeams() {
+    public List<TeamResponse> getAllTeams() {
         return teamService.getAll();
     }
 
     @GetMapping("/{id}")
-    public TeamDto getTeam(@PathVariable long id) {
+    public TeamResponse getTeam(@PathVariable long id) {
         return teamService.getTeam(id);
     }
 
     @DeleteMapping("/{id}")
-    public TeamDto deleteTeam(Principal principal, @PathVariable long id) {
+    public TeamResponse deleteTeam(Principal principal, @PathVariable long id) {
         return teamService.deleteTeam(principal.getName(), id);
     }
 
     @PutMapping("/{id}")
-    private TeamDto updateTeam(Principal principal, @PathVariable Long id, @Valid @RequestBody TeamDto payload) {
+    private TeamResponse updateTeam(Principal principal, @PathVariable long id, @Valid @RequestBody TeamRequest payload) {
         return teamService.updateTeam(principal.getName(), id, payload);
+    }
+
+    @PostMapping("/{id}/users")
+    public TeamResponse addMember(Principal principal, @PathVariable long id, @Valid @RequestBody MemberRequest member) {
+        return teamService.addMember(principal.getName(), id, member);
     }
 }

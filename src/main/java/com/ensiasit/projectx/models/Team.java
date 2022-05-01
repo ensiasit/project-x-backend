@@ -22,15 +22,18 @@ public class Team {
     @Column(unique = true, length = 50)
     private String name;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "contest_id", referencedColumnName = "id")
     private Contest contest;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "affiliation_id", referencedColumnName = "id")
     private Affiliation affiliation;
 
-    @OneToMany
-    @JoinColumn(name = "team_id", referencedColumnName = "id")
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_team",
+            joinColumns = @JoinColumn(name = "team_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
     private Set<User> members;
 }
